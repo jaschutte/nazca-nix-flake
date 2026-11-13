@@ -15,7 +15,12 @@
         system = "x86_64-linux";
       };
 
-      nazca = pkgs.callPackage ./derivation.nix {
+      semiconlab = pkgs.callPackage ./semiconlab.nix {
+        inherit (pkgs.python313Packages) buildPythonPackage;
+        inherit nazca;
+      };
+
+      nazca = pkgs.callPackage ./nazca.nix {
         inherit (pkgs.python313Packages)
           setuptools
           buildPythonPackage
@@ -33,17 +38,21 @@
       python = pkgs.python313.override {
         self = python;
         packageOverrides = final: prev: {
-          inherit nazca;
+          inherit nazca semiconlab;
         };
       };
     in
     {
-      packages.x86_64-linux.default = nazca;
+      packages.x86_64-linux = {
+        inherit nazca semiconlab;
+        default = nazca;
+      };
 
       devShells.x86_64-linux.default = pkgs.mkShell {
         packages = [
           (python.withPackages (pypkgs: [
             pypkgs.nazca
+            pypkgs.semiconlab
           ]))
           pkgs.klayout
         ];

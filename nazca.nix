@@ -3,7 +3,7 @@
   setuptools,
   numpy,
   scipy,
-  pandas,
+  pandas233,
   matplotlib,
   pillow,
   ipython,
@@ -64,7 +64,7 @@ buildPythonPackage rec {
   dependencies = [
     numpy
     scipy
-    pandas
+    pandas233
     matplotlib
     pillow
     ipython

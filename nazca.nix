@@ -57,8 +57,9 @@ buildPythonPackage rec {
     '';
 
   postInstall = ''
-    # Nix doesn't copy over the fonts, but nazca depends on them
+    # Nix doesn't copy over the fonts nor gds files, but nazca depends on them
     cp nazca/fonts/*.nft $out/lib/python3.13/site-packages/nazca/fonts
+    cp nazca/*.gds $out/lib/python3.13/site-packages/nazca
   '';
 
   dependencies = [

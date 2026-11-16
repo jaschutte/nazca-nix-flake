@@ -11,38 +11,39 @@
       nixpkgs,
     }:
     let
-      callPyPackage = pkgs.lib.callPackageWith pkgs.python313Packages;
+      callPyPackage = pkgs.lib.callPackageWith python.pkgs;
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
       };
 
-      semiconlab = callPyPackage ./semiconlab.nix {
-        inherit nazca;
-      };
-
-      pandas233 = callPyPackage ./pandas233.nix {
-        inherit (pkgs)
-          fetchFromGitHub
-          glibc
-          pkg-config
-          runtimeShell
-          ;
-        # Since cython 3.1 isn't packaged in this version of nixpkgs, we just use 3.2
-        # This seems to compile fine
-        cython_3_1 = pkgs.python313Packages.cython_3_2;
-        adv_cmds = pkgs.darwin.adv_cmds;
-      };
-
-      nazca = callPyPackage ./nazca.nix {
-        # Pandas 3.0.4 has an incompatible API with Nazca
-        inherit pandas233;
-      };
+      semiconlab = callPyPackage ./semiconlab.nix { };
+      nazca = callPyPackage ./nazca.nix { };
 
       python = pkgs.python313.override {
         self = python;
         packageOverrides = final: prev: {
           inherit nazca semiconlab;
+
+          pillow = prev.pillow.overridePythonAttrs (old: rec {
+            version = "12.3.0";
+            src = prev.fetchPypi {
+              pname = "pillow";
+              inherit version;
+              sha256 = "sha256-O4GCp2ZoXqoAJjfii07I1rGIGaDHH1eb8NuqWDApfM4=";
+            };
+          });
+          websockets = prev.websockets.overridePythonAttrs (old: rec {
+            version = "16.1.1";
+            src = prev.fetchPypi {
+              pname = "websockets";
+              inherit version;
+              sha256 = "sha256-2yNO2pZdzOFd+Wu5cJ9YfNh9TVKq8OgOLzTsBMdnDFc=";
+            };
+
+            # Fails to find a file used for tests, ignoring it for now
+            doCheck = false;
+          });
         };
       };
     in

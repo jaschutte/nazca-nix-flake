@@ -17,8 +17,8 @@
         system = "x86_64-linux";
       };
 
-      semiconlab = callPyPackage ./semiconlab.nix { };
-      nazca = callPyPackage ./nazca.nix { };
+      semiconlab = callPyPackage ./semiconlab { };
+      nazca = callPyPackage ./nazca { };
 
       python = pkgs.python313.override {
         self = python;
